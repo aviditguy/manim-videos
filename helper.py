@@ -85,24 +85,27 @@ class Vector(VGroup):
         self.index = index
         self.index_from = index_from
         self.index_step = index_step
+        self.index_pos = UP if dir_right else LEFT
 
-        self.nodes = VGroup()
-
-        label_pos = UP if dir_right else LEFT
         indices = range(index_from, index_from + self.len * index_step, index_step)
-        for i, (value, idx) in enumerate(zip(data, indices)):
-            node = Node(
-                value=value,
-                width=width,
-                height=height,
-                font_size=font_size,
-                label=(idx if index else None),
-                label_pos=label_pos,
-            )
-            self.nodes.add(node)
-
-        self.nodes.arrange(self.dir, buff=buff)
+        self.nodes = self.__create_nodes(self.data, indices)
         self.add(self.nodes)
+
+    def __create_nodes(self, data=None, indices=None):
+        nodes = VGroup()
+        for value, idx in zip(data, indices):
+            nodes.add(
+                Node(
+                    value=value,
+                    width=width,
+                    height=height,
+                    font_size=font_size,
+                    label=(idx if index else None),
+                    label_pos=label_pos,
+                )
+            )
+        nodes.arrange(self.dir, buff=self.buff)
+        return nodes
 
     def focus(self, start=0, end=None, color=GREEN, buff=0.1):
         end = self.len if end is None else end
