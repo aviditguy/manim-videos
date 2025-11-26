@@ -79,7 +79,8 @@ class Vector(VGroup):
         self.len = len(data)
 
         self.buff = buff
-        self.dir_right = RIGHT if dir_right else UP
+        self.dir_right = dir_right
+        self.dir = RIGHT if dir_right else UP
 
         self.index = index
         self.index_from = index_from
@@ -87,6 +88,7 @@ class Vector(VGroup):
 
         self.nodes = VGroup()
 
+        label_pos = UP if dir_right else LEFT
         indices = range(index_from, index_from + self.len * index_step, index_step)
         for i, (value, idx) in enumerate(zip(data, indices)):
             node = Node(
@@ -95,10 +97,11 @@ class Vector(VGroup):
                 height=height,
                 font_size=font_size,
                 label=(idx if index else None),
+                label_pos=label_pos,
             )
             self.nodes.add(node)
 
-        self.nodes.arrange(self.dir_right, buff=buff)
+        self.nodes.arrange(self.dir, buff=buff)
         self.add(self.nodes)
 
     def focus(self, start=0, end=None, color=GREEN, buff=0.1):
@@ -146,6 +149,9 @@ class Vector(VGroup):
         shift_dir = LEFT if fromx < tox else RIGHT
         width = self.nodes[0].get_cell().width
 
+        if not self.dir_right:
+            shift_dir = DOWN if fromx < tox else UP
+
         cells = VGroup(*[self.nodes[x].get_cell() for x in [fromx, tox]])
         texts = VGroup(
             *[self.nodes[x].get_text() for x in range(fromx, tox + step, step)]
@@ -159,4 +165,3 @@ class Vector(VGroup):
 
         texts = [self.data[fromx]] + self.data[tox:fromx:-step]
         self.set(*range(fromx, tox + step, step), texts=list(reversed(texts)))
-
